@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171918">
+  <meta name="description" content="Load a tape. Press play. A collection of mixes in an interactive retro stereo cassette player.">
+  <title>Mixtape — Press play.</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a href="#transport" class="skip-link">Skip to playback controls</a>
+  <div class="page">
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="Mixtape home">mix<span>tape</span><i aria-hidden="true">®</i></a>
+      <div class="header-caption">THE PERSONAL MIX COLLECTION<br><span>GOOD MUSIC. NO ALGORITHM.</span></div>
+      <a href="#collection" class="collection-link">THE TAPE SHELF <span aria-hidden="true">↘</span></a>
+    </header>
+
+    <main>
+      <div class="intro"><h1>Long live the mixtape.</h1><p>Pick a tape. Press play. Stay a while.</p></div>
+      <section class="stereo-area" aria-label="Stereo cassette player">
+        <div class="carry-handle" aria-hidden="true"></div>
+        <div class="boombox" id="boombox">
+          <div class="top-rail">
+            <div class="hardware-brand">MIXTAPE<span>STEREO CASSETTE SYSTEM</span></div>
+            <div class="model-number">MT–<b>1984</b><span>HIGH FIDELITY / PORTABLE STEREO</span></div>
+          </div>
+
+          <div class="tuner-row">
+            <div class="power-indicator"><span id="power-led" class="led"></span><span id="power-label">STANDBY</span></div>
+            <div class="tuner" aria-hidden="true"><div class="tuner-scale"><span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108 <small>MHz</small></span></div><div class="tuner-ticks"></div><div class="tuner-needle"></div></div>
+            <span class="stereo-badge">FM <b>STEREO</b></span>
+          </div>
+
+          <div class="main-hardware">
+            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div><div class="speaker-caption">2-WAY SPEAKER SYSTEM <span>L</span></div></div>
+
+            <div class="deck">
+              <div class="deck-topline"><span>CASSETTE DECK</span><span>AUTO PLAY →</span></div>
+              <div class="cassette-door" id="cassette-door">
+                <div class="empty-deck"><span>NO TAPE</span><small>Choose one from the shelf below</small></div>
+                <div class="cassette loaded-tape" id="loaded-tape" aria-label="Loaded cassette">
+                  <div class="tape-label"><div class="label-heading"><b>A</b><span id="tape-artist">tableTRASH</span><span class="tape-type">MIX / 01</span></div><div class="handwritten" id="tape-title">Round 2! It's here!</div></div>
+                  <div class="tape-stripe"></div>
+                  <div class="reel-window"><div class="reel" aria-hidden="true"></div><div class="tape-window" aria-hidden="true"><div></div></div><div class="reel" aria-hidden="true"></div></div>
+                  <div class="cassette-bottom"><span>HIGH BIAS</span><span>STEREO</span></div>
+                </div>
+                <div class="door-bottom" aria-hidden="true">FULL AUTO STOP <span>▰▰</span></div>
+              </div>
+              <div class="transport" id="transport" role="group" aria-label="Tape transport">
+                <button type="button" id="previous" class="transport-key" aria-label="Previous tape" title="Previous tape"><span class="key-icon">⏮</span><span>PREV</span></button>
+                <button type="button" id="rewind" class="transport-key" aria-label="Rewind 15 seconds" title="Rewind 15 seconds"><span class="key-icon">⏪</span><span>REW</span></button>
+                <button type="button" id="play" class="transport-key play-key" aria-label="Play" title="Play / pause (Space)"><span class="key-icon" id="play-icon">▶</span><span id="play-label">PLAY</span></button>
+                <button type="button" id="forward" class="transport-key" aria-label="Forward 15 seconds" title="Forward 15 seconds"><span class="key-icon">⏩</span><span>F.FWD</span></button>
+                <button type="button" id="next" class="transport-key" aria-label="Next tape" title="Next tape"><span class="key-icon">⏭</span><span>NEXT</span></button>
+                <button type="button" id="eject" class="transport-key" aria-label="Eject tape" title="Eject tape"><span class="key-icon">⏏</span><span>EJECT</span></button>
+              </div>
+            </div>
+
+            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div><div class="speaker-caption">2-WAY SPEAKER SYSTEM <span>R</span></div></div>
+          </div>
+
+          <div class="bottom-rail">
+            <div class="level-meter" aria-hidden="true"><div class="meter-caption"><span>OUTPUT LEVEL</span><span>−20　−10　0　+3</span></div><div class="meter-line"><b>L</b><div class="meter-track"><div class="meter-fill"></div></div></div><div class="meter-line"><b>R</b><div class="meter-track"><div class="meter-fill"></div></div></div></div>
+            <div class="counter"><span>TAPE COUNTER</span><output id="counter">0000</output></div>
+            <div class="volume-control"><button id="mute" type="button" aria-label="Mute" aria-pressed="false">VOL</button><span aria-hidden="true">−</span><input id="volume" type="range" min="0" max="100" value="75" aria-label="Volume"><span aria-hidden="true">+</span></div>
+          </div>
+          <i class="screw tl" aria-hidden="true"></i><i class="screw tr" aria-hidden="true"></i><i class="screw bl" aria-hidden="true"></i><i class="screw br" aria-hidden="true"></i>
+        </div>
+        <div class="feet" aria-hidden="true"><i></i><i></i></div>
+      </section>
+
+      <section class="now-playing" aria-label="Now playing">
+        <div class="now-copy"><span class="eyebrow" id="playback-state">READY TO PLAY · TAPE 01</span><h2 id="now-title">Round 2! It's here!</h2><p id="now-artist">tableTRASH</p></div>
+        <div class="timeline"><div class="time-labels"><span id="elapsed">0:00</span><span id="duration">—:—</span></div><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Playback position" disabled><div class="timeline-caption"><span id="status" role="status" aria-live="polite">Press play to start the tape.</span><span class="shortcut"><kbd>SPACE</kbd> PLAY / PAUSE</span></div></div>
+      </section>
+
+      <section class="collection" id="collection" aria-labelledby="collection-heading">
+        <div class="collection-heading"><div><span class="eyebrow">THE COLLECTION</span><h2 id="collection-heading">On the tape shelf<span id="tape-count">47</span></h2></div><p>Select a cassette to load it into the deck.</p></div>
+        <ol id="tape-shelf" class="tape-shelf"></ol>
+        <button id="show-all" type="button" class="show-all" aria-expanded="false" aria-controls="tape-shelf">View all 47 tapes <span aria-hidden="true">↓</span></button>
+      </section>
+    </main>
+    <footer><span class="footer-logo">mixtape.</span><span>MADE FOR LISTENING, NOT SKIPPING.</span><span>BE KIND. REWIND. ↶</span></footer>
+  </div>
+  <audio id="audio" preload="metadata"></audio>
+  <noscript><p class="noscript">This cassette player needs JavaScript. <a href="https://mixtape.ididthis.xyz/01-TableTRASH-Round_2!_Its_here!.mp3">Listen to the first mix directly.</a></p></noscript>
+</body>
+</html>

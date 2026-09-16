@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "echo No dependencies to install",
+  "buildCommand": "npm run check",
+  "outputDirectory": "dist"
+}
