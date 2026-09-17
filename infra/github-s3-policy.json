@@ -11,6 +11,11 @@
         "arn:aws:s3:::mixtape-tabletrash/styles.css",
         "arn:aws:s3:::mixtape-tabletrash/favicon.svg"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"],
+      "Resource": "arn:aws:cloudfront::325414188990:distribution/E3CR4YZ8F01SPE"
     }
   ]
 }

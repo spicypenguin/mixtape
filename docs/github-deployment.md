@@ -7,7 +7,7 @@ The workflow tests and builds pull requests. Pushes to `main` or `master` deploy
 1. The GitHub repository is `spicypenguin/mixtape`; the local `origin` uses `git@github.com:spicypenguin/mixtape.git`.
 2. In GitHub **Settings → Environments**, create `production` and restrict deployment branches to your default branch. This restriction is important because the AWS trust policy below trusts this environment.
 3. In AWS IAM, add the OpenID Connect provider `https://token.actions.githubusercontent.com` with audience `sts.amazonaws.com`, unless it already exists.
-4. Create an IAM role with the trust policy below, replacing `325414188990` and `spicypenguin/mixtape`. Attach the permissions policy below, replacing the distribution ARN. No long-lived AWS keys are needed.
+4. Create an IAM role with the trust policy below, replacing `325414188990` and `spicypenguin/mixtape`. Attach the permissions policy below, using the confirmed distribution ARN. No long-lived AWS keys are needed.
 5. Under the GitHub `production` environment's **Variables**, configure:
 
 | Variable | Value |
@@ -15,7 +15,7 @@ The workflow tests and builds pull requests. Pushes to `main` or `master` deploy
 | `AWS_ROLE_ARN` | ARN of the IAM role created above (required) |
 | `AWS_REGION` | `us-east-1` by default; override if needed |
 | `S3_BUCKET` | `mixtape-tabletrash` by default; override if needed |
-| `CLOUDFRONT_DISTRIBUTION_ID` | Existing CloudFront distribution ID; leave empty only if invalidation is unnecessary |
+| `CLOUDFRONT_DISTRIBUTION_ID` | `E3CR4YZ8F01SPE` |
 
 6. Run **Actions → Build and deploy to S3 → Run workflow** from the default branch. Future pushes deploy automatically.
 
@@ -60,7 +60,7 @@ This permits writes only to the frontend keys. It does not permit deletion or au
     {
       "Effect": "Allow",
       "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"],
-      "Resource": "arn:aws:cloudfront::325414188990:distribution/DISTRIBUTION_ID"
+      "Resource": "arn:aws:cloudfront::325414188990:distribution/E3CR4YZ8F01SPE"
     }
   ]
 }
@@ -72,3 +72,16 @@ Upload new MP3s separately, edit `config/tapes.json`, then push. Actions rebuild
 
 See [GitHub's AWS OIDC instructions](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) and the [official AWS credential action](https://github.com/aws-actions/configure-aws-credentials).
 
+
+## Confirmed AWS target
+
+CloudFront distribution: `E3CR4YZ8F01SPE` (`d1us7zvih6qn4t.cloudfront.net`). The role setup now includes permission to invalidate only this distribution.
+
+If you already ran the earlier role setup, update its inline policy from AWS CloudShell:
+
+```bash
+git pull --ff-only
+aws iam put-role-policy --role-name mixtape-github-deploy --policy-name MixtapeFrontendUpload --policy-document file://infra/github-s3-policy.json
+```
+
+After role setup, set GitHub variable `AWS_ROLE_ARN` to `arn:aws:iam::325414188990:role/mixtape-github-deploy` and run the deployment workflow.

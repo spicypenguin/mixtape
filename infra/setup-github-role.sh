@@ -18,4 +18,4 @@ fi
 aws iam create-role --role-name "$role" --assume-role-policy-document file://github-trust-policy.json
 aws iam put-role-policy --role-name "$role" --policy-name MixtapeFrontendUpload --policy-document file://github-s3-policy.json
 echo 'Created role: arn:aws:iam::325414188990:role/mixtape-github-deploy'
-echo 'CloudFront permissions must be added separately using the distribution ARN in docs/github-deployment.md.'
+echo 'Includes frontend upload and cache invalidation for CloudFront E3CR4YZ8F01SPE.'
