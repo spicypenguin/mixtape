@@ -16,6 +16,8 @@ The audio element deliberately does not set `crossorigin`: ordinary remote audio
 
 ## Deployment
 
+For automated GitHub builds and S3 deployment, see [GitHub Actions setup](docs/github-deployment.md). The workflow uses AWS OIDC and preserves all audio objects.
+
 - **S3 + CloudFront:** upload the contents of `dist/` beside the MP3s. Do not delete or overwrite audio objects. Invalidate the five frontend paths after deployment; do not use a bucket sync with `--delete`.
 - **Vercel / Netlify:** import the Git repository, use `npm run build` as the build command, and set the publish/output directory to `dist`. Audio must use its own hostname before moving the current site domain.
 - **NAS:** serve `dist/` through a static web server. The frontend has no Node runtime requirement. Audio can stay on AWS.

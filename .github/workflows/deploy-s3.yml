@@ -1,0 +1,93 @@
+name: Build and deploy to S3
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: s3-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      # No npm install: this project has no package dependencies.
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+      S3_BUCKET: ${{ vars.S3_BUCKET || 'mixtape-tabletrash' }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      AWS_PAGER: ''
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Validate deployment settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${AWS_ROLE_ARN:?Set the AWS_ROLE_ARN GitHub variable}"
+          : "${S3_BUCKET:?Set the S3_BUCKET GitHub variable}"
+      - run: npm run build
+      - name: Authenticate to AWS with OIDC
+        uses: aws-actions/configure-aws-credentials@cabfdba3510de1431bac9dba27511d97497fc100 # v5
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: mixtape-${{ github.run_id }}
+      - name: Upload frontend assets, then HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Explicit allowlist: never upload audio, source, or delete bucket objects.
+          for file in app.js tracks.js styles.css favicon.svg index.html; do
+            aws s3 cp "dist/$file" "s3://$S3_BUCKET/$file" \
+              --cache-control 'no-cache, max-age=0, must-revalidate' \
+              --only-show-errors
+          done
+      - name: Refresh CloudFront frontend paths
+        if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          invalidation_id=$(aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths '/' '/index.html' '/app.js' '/tracks.js' '/styles.css' '/favicon.svg' \
+            --query 'Invalidation.Id' --output text)
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" --id "$invalidation_id"
+      - name: Deployment summary
+        shell: bash
+        run: |
+          echo "Deployed five frontend files to s3://$S3_BUCKET. Audio objects were preserved." >> "$GITHUB_STEP_SUMMARY"
+          if [[ -z "$CLOUDFRONT_DISTRIBUTION_ID" ]]; then
+            echo 'CloudFront invalidation skipped: set CLOUDFRONT_DISTRIBUTION_ID if this bucket is served by CloudFront.' >> "$GITHUB_STEP_SUMMARY"
+          fi
