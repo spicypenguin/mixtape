@@ -26,10 +26,20 @@ For any other tape, supply files in the desired playback order:
 python tools/merge_mixtapes.py "01.mp3" "02.mp3" "03.mp3" --title "My mix" --artist "DJ name"
 ```
 
-The `merged/` folder receives one MP3 and one `.chapters.json` per tape. The MP3 has ID3 CHAP chapter frames and an ordered CTOC table, which chapter-aware players can use to jump between tracks. Ordinary HTML audio does **not** expose these markers. The JSON contains chapter titles and start/end seconds for a website chapter list or next/previous-track controls; website chapter integration is a separate step.
+The `merged/` folder receives one MP3 and one `.chapters.json` per tape. The MP3 has ID3 CHAP chapter frames and an ordered CTOC table, which chapter-aware players can use to jump between tracks. Ordinary HTML audio does **not** expose these markers. The JSON contains chapter titles and start/end seconds for a website chapter list or next/previous-track controls; the website reads these chapter timings from its build-time catalog.
 
 Chapter titles come from each source's title tag. Missing or repeated titles become `Track 01`, `Track 02`, etc. To supply song names, pass `--chapter-titles titles.json`, where the file is a JSON array containing one title per input file. Run presets separately when supplying titles.
 
 The script decodes each part to stereo 44.1 kHz PCM, joins the decoded samples, and encodes once at 320 kbps. This accommodates differing source sample rates/channels, avoids repeated MP3 encoder padding at the joins, and adds no silence or crossfades. MP3 re-encoding is lossy; it cannot restore source quality or remove silence already present in the recordings. Use `--bitrate 192k` for smaller files. Allow roughly 635 MB of temporary PCM space per hour of audio, plus downloads and output.
 
 Originals remain untouched. Existing outputs are rejected unless `--overwrite` is supplied. The script verifies embedded chapter counts and timings before moving the finished files into place. Downloads and intermediate PCM are cleaned up on success or failure. Outputs are local only; nothing is uploaded to S3 or changed on the website.
+
+## Importing merged tapes into the catalog
+
+Pass `--update-config config/tapes.json` when merging to replace the matching contiguous source entries with one tape. Or import existing sidecars without re-encoding:
+
+```sh
+python tools/merge_mixtapes.py --import-chapters tracks/tabletrash-round-09.chapters.json tracks/tabletrash-round-10.chapters.json --update-config config/tapes.json
+```
+
+Upload the corresponding MP3s before deploying a catalog that references them. The active 11-tape catalog is `config/tapes.json`; it already includes the approved filenames and chapter timings.

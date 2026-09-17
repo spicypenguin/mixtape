@@ -6,3 +6,4 @@ merged/
 __pycache__/
 .test-deps/
 .test-audio/
+/tracks/

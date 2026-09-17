@@ -1,0 +1,309 @@
+{
+  "audioBaseUrl": "https://mixtape.ididthis.xyz/",
+  "tapes": [
+    {
+      "id": "tape-01",
+      "title": "Round 02: It's Here!",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-02.mp3"
+    },
+    {
+      "id": "tape-02",
+      "title": "Round 03: About Time Already",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-03.mp3"
+    },
+    {
+      "id": "tape-03",
+      "title": "Round 04: Knockout",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-04.mp3"
+    },
+    {
+      "id": "tape-04",
+      "title": "Round 05: A Round (About Time)",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-05.mp3"
+    },
+    {
+      "id": "tape-05",
+      "title": "Round 06",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-06.mp3"
+    },
+    {
+      "id": "tape-06",
+      "title": "Round 07",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-07.mp3"
+    },
+    {
+      "id": "tape-07",
+      "title": "Round 08",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-08.mp3"
+    },
+    {
+      "id": "merged-round-9---the-year-of-the-trash",
+      "title": "Round 09: The Year of the Trash",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-09.mp3",
+      "durationSeconds": 4797.573,
+      "chapters": [
+        {
+          "title": "Track 01",
+          "startSeconds": 0.0,
+          "endSeconds": 151.987
+        },
+        {
+          "title": "Track 02",
+          "startSeconds": 151.987,
+          "endSeconds": 320.773
+        },
+        {
+          "title": "Track 03",
+          "startSeconds": 320.773,
+          "endSeconds": 501.787
+        },
+        {
+          "title": "Track 04",
+          "startSeconds": 501.787,
+          "endSeconds": 697.867
+        },
+        {
+          "title": "Track 05",
+          "startSeconds": 697.867,
+          "endSeconds": 904.387
+        },
+        {
+          "title": "Track 06",
+          "startSeconds": 904.387,
+          "endSeconds": 1206.773
+        },
+        {
+          "title": "Track 07",
+          "startSeconds": 1206.773,
+          "endSeconds": 1463.427
+        },
+        {
+          "title": "Track 08",
+          "startSeconds": 1463.427,
+          "endSeconds": 1749.96
+        },
+        {
+          "title": "Track 09",
+          "startSeconds": 1749.96,
+          "endSeconds": 2043.267
+        },
+        {
+          "title": "Track 10",
+          "startSeconds": 2043.267,
+          "endSeconds": 2297.387
+        },
+        {
+          "title": "Track 11",
+          "startSeconds": 2297.387,
+          "endSeconds": 2609.2
+        },
+        {
+          "title": "Track 12",
+          "startSeconds": 2609.2,
+          "endSeconds": 2900.0
+        },
+        {
+          "title": "Track 13",
+          "startSeconds": 2900.0,
+          "endSeconds": 3156.307
+        },
+        {
+          "title": "Track 14",
+          "startSeconds": 3156.307,
+          "endSeconds": 3325.973
+        },
+        {
+          "title": "Track 15",
+          "startSeconds": 3325.973,
+          "endSeconds": 3574.96
+        },
+        {
+          "title": "Track 16",
+          "startSeconds": 3574.96,
+          "endSeconds": 3986.147
+        },
+        {
+          "title": "Track 17",
+          "startSeconds": 3986.147,
+          "endSeconds": 4326.147
+        },
+        {
+          "title": "Track 18",
+          "startSeconds": 4326.147,
+          "endSeconds": 4797.573
+        }
+      ],
+      "mergedFrom": [
+        "08-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "09-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "10-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "11-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "12-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "13-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "14-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "15-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "16-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "17-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "18-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "19-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "20-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "21-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "22-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "23-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "24-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3",
+        "25-tableTRASH-Round_9_-_The_Year_of_the_Trash.mp3"
+      ]
+    },
+    {
+      "id": "merged-round-x",
+      "title": "Round 10",
+      "artist": "tableTRASH",
+      "file": "tabletrash-round-10.mp3",
+      "durationSeconds": 4562.96,
+      "chapters": [
+        {
+          "title": "Track 01",
+          "startSeconds": 0.0,
+          "endSeconds": 51.933
+        },
+        {
+          "title": "Track 02",
+          "startSeconds": 51.933,
+          "endSeconds": 271.36
+        },
+        {
+          "title": "Track 03",
+          "startSeconds": 271.36,
+          "endSeconds": 421.347
+        },
+        {
+          "title": "Track 04",
+          "startSeconds": 421.347,
+          "endSeconds": 631.333
+        },
+        {
+          "title": "Track 05",
+          "startSeconds": 631.333,
+          "endSeconds": 843.213
+        },
+        {
+          "title": "Track 06",
+          "startSeconds": 843.213,
+          "endSeconds": 1067.253
+        },
+        {
+          "title": "Track 07",
+          "startSeconds": 1067.253,
+          "endSeconds": 1204.12
+        },
+        {
+          "title": "Track 08",
+          "startSeconds": 1204.12,
+          "endSeconds": 1516.307
+        },
+        {
+          "title": "Track 09",
+          "startSeconds": 1516.307,
+          "endSeconds": 1700.053
+        },
+        {
+          "title": "Track 10",
+          "startSeconds": 1700.053,
+          "endSeconds": 1943.827
+        },
+        {
+          "title": "Track 11",
+          "startSeconds": 1943.827,
+          "endSeconds": 2201.613
+        },
+        {
+          "title": "Track 12",
+          "startSeconds": 2201.613,
+          "endSeconds": 2452.853
+        },
+        {
+          "title": "Track 13",
+          "startSeconds": 2452.853,
+          "endSeconds": 2719.12
+        },
+        {
+          "title": "Track 14",
+          "startSeconds": 2719.12,
+          "endSeconds": 3021.867
+        },
+        {
+          "title": "Track 15",
+          "startSeconds": 3021.867,
+          "endSeconds": 3290.093
+        },
+        {
+          "title": "Track 16",
+          "startSeconds": 3290.093,
+          "endSeconds": 3558.213
+        },
+        {
+          "title": "Track 17",
+          "startSeconds": 3558.213,
+          "endSeconds": 3768.213
+        },
+        {
+          "title": "Track 18",
+          "startSeconds": 3768.213,
+          "endSeconds": 3962.96
+        },
+        {
+          "title": "Track 19",
+          "startSeconds": 3962.96,
+          "endSeconds": 4262.947
+        },
+        {
+          "title": "Track 20",
+          "startSeconds": 4262.947,
+          "endSeconds": 4562.96
+        }
+      ],
+      "mergedFrom": [
+        "26-tableTRASH - tableTRASH _ ROUND_X.mp3",
+        "27-tableTRASH - tableTRASH _ ROUND_X_1.mp3",
+        "28-tableTRASH - tableTRASH _ ROUND_X_2.mp3",
+        "29-tableTRASH - tableTRASH _ ROUND_X_3.mp3",
+        "30-tableTRASH - tableTRASH _ ROUND_X_4.mp3",
+        "31-tableTRASH - tableTRASH _ ROUND_X_5.mp3",
+        "32-tableTRASH - tableTRASH _ ROUND_X_6.mp3",
+        "33-tableTRASH - tableTRASH _ ROUND_X_7.mp3",
+        "34-tableTRASH - tableTRASH _ ROUND_X_8.mp3",
+        "35-tableTRASH - tableTRASH _ ROUND_X_9.mp3",
+        "36-tableTRASH - tableTRASH _ ROUND_X_10.mp3",
+        "37-tableTRASH - tableTRASH _ ROUND_X_11.mp3",
+        "38-tableTRASH - tableTRASH _ ROUND_X_12.mp3",
+        "39-tableTRASH - tableTRASH _ ROUND_X_13.mp3",
+        "40-tableTRASH - tableTRASH _ ROUND_X_14.mp3",
+        "41-tableTRASH - tableTRASH _ ROUND_X_15.mp3",
+        "42-tableTRASH - tableTRASH _ ROUND_X_16.mp3",
+        "43-tableTRASH - tableTRASH _ ROUND_X_17.mp3",
+        "44-tableTRASH - tableTRASH _ ROUND_X_18.mp3",
+        "45-tableTRASH - tableTRASH _ ROUND_X_19.mp3"
+      ]
+    },
+    {
+      "id": "tape-46",
+      "title": "February 2011 Mix",
+      "artist": "fRew",
+      "file": "frew-2011-02.mp3"
+    },
+    {
+      "id": "tape-47",
+      "title": "Marcello's Birthday Teaser",
+      "artist": "",
+      "file": "marcellos-birthday-teaser.mp3"
+    }
+  ]
+}

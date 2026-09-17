@@ -12,6 +12,7 @@ a .chapters.json sidecar, since HTML audio doesn't expose MP3 chapters.
 from __future__ import annotations
 
 import argparse
+import copy
 from collections import Counter
 import json
 from pathlib import Path
@@ -52,7 +53,13 @@ def parse_args(argv=None):
     parser.add_argument("--ffmpeg", default="ffmpeg", help="FFmpeg executable name or full path")
     parser.add_argument("--overwrite", action="store_true", help="Explicitly allow replacing existing output files")
     parser.add_argument("--dry-run", action="store_true", help="Show file order without downloading or encoding")
+    parser.add_argument("--update-config", type=Path, help="Replace the merged source entries in this tape config after successful merging")
+    parser.add_argument("--import-chapters", nargs="+", type=Path, help="Update config from existing .chapters.json files without re-encoding")
     args = parser.parse_args(argv)
+    if args.import_chapters:
+        if not args.update_config or args.files or args.preset or args.download:
+            parser.error("--import-chapters requires --update-config and cannot be combined with files, --preset, or --download.")
+        return args
     if bool(args.files) == bool(args.preset):
         parser.error("Choose either explicit files or --preset, not both.")
     if args.download and not args.preset:
@@ -70,6 +77,78 @@ def slug(title):
     if value.split(".")[0].upper() in {"CON", "PRN", "AUX", "NUL", *[f"COM{i}" for i in range(1, 10)], *[f"LPT{i}" for i in range(1, 10)]}:
         value = "mix-" + value
     return value
+
+
+def source_name(value):
+    return unquote(str(value).replace("\\", "/").rsplit("/", 1)[-1])
+
+
+def catalog_with_merges(config, mixes):
+    """Return a new catalog; fail closed if sources are missing or ambiguous."""
+    updated = copy.deepcopy(config)
+    if not isinstance(updated, dict) or not isinstance(updated.get("tapes"), list):
+        raise ValueError("Expected a tape config object with a tapes array.")
+    for mix in mixes:
+        if not isinstance(mix, dict) or not all(isinstance(mix.get(k), str) and mix[k].strip() for k in ("title", "file")) or not isinstance(mix.get("artist"), str):
+            raise ValueError("Invalid merged-tape metadata: title, artist, and file are required.")
+        chapters = mix.get("chapters")
+        if not isinstance(chapters, list) or not chapters:
+            raise ValueError("The chapter file must contain at least one chapter.")
+        previous_end = 0
+        names = []
+        for index, chapter in enumerate(chapters):
+            start, end = chapter.get("startSeconds"), chapter.get("endSeconds")
+            if not isinstance(start, (int, float)) or not isinstance(end, (int, float)) or not (start >= previous_end and end > start and end < float("inf")) or (index == 0 and start != 0):
+                raise ValueError("Chapter times must start at zero and be ordered without overlaps.")
+            if not isinstance(chapter.get("title"), str) or not chapter["title"].strip() or not chapter.get("source"):
+                raise ValueError("Each chapter needs a title and source filename.")
+            previous_end = end
+            names.append(source_name(chapter["source"]))
+        if len(set(names)) != len(names):
+            raise ValueError("Cannot update config for duplicate source filenames.")
+        identifier = "merged-" + slug(mix["title"]).lower()
+        tapes = updated["tapes"]
+        existing = [i for i, tape in enumerate(tapes) if tape.get("id") == identifier]
+        if existing:
+            if len(existing) != 1 or tapes[existing[0]].get("file") != mix["file"] or tapes[existing[0]].get("mergedFrom") != names:
+                raise ValueError(f"Tape ID collision: {identifier}")
+            positions = existing
+        else:
+            positions = []
+            for name in names:
+                matches = [i for i, tape in enumerate(tapes) if source_name(tape.get("file", "")) == name]
+                if len(matches) != 1:
+                    raise ValueError(f"Expected exactly one config entry for {name}; found {len(matches)}.")
+                positions.append(matches[0])
+            if positions != sorted(positions) or positions != list(range(positions[0], positions[0] + len(positions))):
+                raise ValueError("Source tapes must be consecutive and in chapter order in the config.")
+        entry = {"id": identifier, "title": mix["title"], "artist": mix["artist"], "file": mix["file"], "durationSeconds": previous_end,
+                 "chapters": [{k: chapter[k] for k in ("title", "startSeconds", "endSeconds")} for chapter in chapters], "mergedFrom": names}
+        updated["tapes"] = [entry if i == positions[0] else tape for i, tape in enumerate(tapes) if i == positions[0] or i not in positions]
+    return updated
+
+
+def update_catalog(path, mixes, dry_run=False):
+    path = path.resolve()
+    original = path.read_text(encoding="utf-8-sig")
+    config = json.loads(original)
+    updated = catalog_with_merges(config, mixes)
+    if dry_run:
+        print(f"Would update {path}: {len(config['tapes'])} -> {len(updated['tapes'])} tapes. No files changed.")
+        return
+    # A sibling temporary file allows an atomic replacement on the same volume.
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, prefix=".tapes-", suffix=".tmp", delete=False) as stream:
+        pending = Path(stream.name)
+        json.dump(updated, stream, indent=2, ensure_ascii=False)
+        stream.write("\n")
+    try:
+        if path.read_text(encoding="utf-8-sig") != original:
+            raise RuntimeError("Tape config changed during import; refusing to overwrite it.")
+        pending.replace(path)
+    finally:
+        pending.unlink(missing_ok=True)
+    print(f"Updated {path}: {len(config['tapes'])} -> {len(updated['tapes'])} tapes.")
+    print("Upload the merged MP3s to the configured audio origin BEFORE building and deploying the updated catalog.")
 
 
 def plans(args):
@@ -190,10 +269,15 @@ def merge(title, sources, args, ffmpeg):
         encoded.replace(output)
         json_file.replace(sidecar)
     print(f"Created: {output}\nChapters: {sidecar}", flush=True)
+    return metadata
 
 
 def main(argv=None):
     args = parse_args(argv)
+    if args.import_chapters:
+        mixes = [json.loads(path.read_text(encoding="utf-8-sig")) for path in args.import_chapters]
+        update_catalog(args.update_config, mixes, args.dry_run)
+        return 0
     jobs = plans(args)
     for title, sources in jobs:
         print(f"{title} — {len(sources)} tracks")
@@ -214,8 +298,13 @@ def main(argv=None):
         for source in sources:
             if isinstance(source, Path) and not source.is_file():
                 raise FileNotFoundError(f"Missing source: {source}")
-    for title, sources in jobs:
-        merge(title, sources, args, ffmpeg)
+    if args.update_config:
+        # Check all replacements before any potentially lengthy downloads/encoding.
+        preview = [{"title": title, "artist": args.artist, "file": slug(title) + ".mp3", "chapters": [{"title": f"Track {i+1}", "startSeconds": i, "endSeconds": i+1, "source": source_name(source)} for i, source in enumerate(sources)]} for title, sources in jobs]
+        catalog_with_merges(json.loads(args.update_config.read_text(encoding="utf-8-sig")), preview)
+    mixes = [merge(title, sources, args, ffmpeg) for title, sources in jobs]
+    if args.update_config:
+        update_catalog(args.update_config, mixes)
     return 0
 
 
