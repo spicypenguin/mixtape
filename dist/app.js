@@ -104,6 +104,9 @@ function updateProgress() {
 
 function updatePlayback() {
   const playing = !audio.paused && !audio.ended && !ejected;
+  $('player-heading').classList.toggle('is-empty', ejected);
+  $('playback-state').hidden = ejected;
+  $('playback-timeline').hidden = ejected;
   box.classList.toggle('is-playing', playing);
   $('play').classList.toggle('is-active', playing);
   $('play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
@@ -184,8 +187,8 @@ function ejectTape() {
   audio.load();
   box.classList.add('is-ejected');
   box.classList.remove('is-buffering');
-  $('now-title').textContent = 'Room for another mixtape.';
-  $('now-artist').textContent = 'Choose a cassette from the shelf.';
+  $('now-title').textContent = 'Long live the mixtape.';
+  $('now-artist').textContent = 'Pick a tape. Press play. Stay a while.';
   document.title = 'Mixtape — Press play.';
   status('Tape ejected. Pick a tape, or press play to reload.');
   updateShelfSelection();
