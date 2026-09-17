@@ -32,7 +32,7 @@ The bucket and CloudFront distribution must already serve this site. The workflo
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {"StringEquals": {
       "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-      "token.actions.githubusercontent.com:sub": "repo:spicypenguin/mixtape:environment:production"
+      "token.actions.githubusercontent.com:sub": "repo:spicypenguin@17858374/mixtape@1373871909:environment:production"
     }}
   }]
 }
