@@ -7,11 +7,33 @@ const shelf = $('tape-shelf');
 const seek = $('seek');
 const volume = $('volume');
 let current = 0;
-let ejected = false;
+let ejected = true;
 let expanded = false;
 let requestId = 0;
 let lastVolume = .75;
 let seeking = false;
+let meterTimer = null;
+const meterFills = [...document.querySelectorAll('.meter-fill')];
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+// Playback-responsive decorative meters: the existing audio origin does not
+// allow cross-origin Web Audio analysis. Never route it into a silent analyser.
+function updateMeters() {
+  const active = !audio.paused && !audio.ended && !ejected && audio.readyState >= 3 && !box.classList.contains('is-buffering');
+  const gain = audio.muted ? 0 : audio.volume;
+  const draw = () => {
+    const base = reducedMotion.matches ? .55 : .3 + Math.random() * .6;
+    meterFills.forEach((fill) => {
+      const level = active ? Math.min(1, base + (reducedMotion.matches ? 0 : (Math.random() - .5) * .24)) * gain : 0;
+      fill.style.width = `${Math.round(level * 100)}%`;
+    });
+  };
+  clearInterval(meterTimer);
+  meterTimer = null;
+  draw();
+  if (active && gain > 0 && !reducedMotion.matches) meterTimer = setInterval(draw, 125);
+}
+reducedMotion.addEventListener('change', updateMeters);
 const colors = [
   ['#e1d8b8','#df683b'], ['#c7d0c4','#537e78'], ['#e0bdad','#bd4c40'],
   ['#c0c9df','#65629a'], ['#dbcda8','#c49a36'], ['#ccd2ac','#7f9351'],
@@ -32,7 +54,7 @@ function drawShelf() {
   const fragment = document.createDocumentFragment();
   for (const [i, track] of tracks.entries()) {
     const item = document.createElement('li');
-    item.hidden = !expanded && i >= 8 && (i !== current || ejected);
+    item.hidden = !expanded && i >= 12 && (i !== current || ejected);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'tape-card';
@@ -41,13 +63,11 @@ function drawShelf() {
     button.style.setProperty('--tape-color', colors[i % colors.length][0]);
     button.style.setProperty('--tape-accent', colors[i % colors.length][1]);
     // All varying text is assigned with textContent, never interpreted as HTML.
-    button.innerHTML = `<div class="mini-cassette" aria-hidden="true"><div class="mini-label"><div class="mini-topline"><b>A</b><span class="mini-artist"></span><span class="mini-id"></span></div><div class="mini-title"></div><div class="mini-stripe"></div></div><div class="mini-reels"><i></i><i></i></div><div class="mini-bottom"><span>HIGH BIAS</span><span>STEREO</span></div></div><div class="tape-info"><span class="card-number"></span><span class="card-copy"><span class="card-title"></span><span class="card-artist"></span></span></div>`;
-    button.querySelector('.mini-artist').textContent = track.artist || 'MIXTAPE';
-    button.querySelector('.mini-id').textContent = String(track.id).padStart(2, '0');
-    button.querySelector('.mini-title').textContent = track.title;
-    button.querySelector('.card-number').textContent = String(track.id).padStart(2, '0');
-    button.querySelector('.card-title').textContent = track.title;
-    button.querySelector('.card-artist').textContent = track.artist || 'DJ mix';
+    button.innerHTML = '<div class="case-spine"><span class="spine-number"></span><span class="spine-label"><span class="spine-title"></span><span class="spine-artist"></span></span><span class="spine-format" aria-hidden="true">STEREO</span></div>';
+    button.querySelector('.spine-number').textContent = String(track.id).padStart(2, '0');
+    button.querySelector('.spine-title').textContent = track.title;
+    button.querySelector('.spine-artist').textContent = track.artist || 'Unknown artist';
+    button.title = track.title + ' — ' + (track.artist || 'Unknown artist');
     if (i === current && !ejected) {
       const marker = document.createElement('span');
       marker.className = 'loaded-marker';
@@ -64,7 +84,7 @@ function drawShelf() {
 function updateShelfSelection() {
   // Keep existing buttons mounted so keyboard focus survives a selection.
   Array.from(shelf.children).forEach((item, i) => {
-    item.hidden = !expanded && i >= 8 && (i !== current || ejected);
+    item.hidden = !expanded && i >= 12 && (i !== current || ejected);
     const button = item.firstElementChild;
     const selected = i === current && !ejected;
     button.setAttribute('aria-pressed', String(selected));
@@ -93,7 +113,6 @@ function updateProgress() {
   }
   $('elapsed').textContent = time(ejected ? 0 : position);
   $('duration').textContent = knownDuration ? time(duration) : '—:—';
-  $('counter').textContent = String(Math.floor(ejected ? 0 : position)).padStart(4, '0');
   if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
     try {
       if (knownDuration) navigator.mediaSession.setPositionState({ duration, playbackRate: audio.playbackRate, position: Math.min(position, duration) });
@@ -107,6 +126,7 @@ function updatePlayback() {
   $('player-heading').classList.toggle('is-empty', ejected);
   $('playback-state').hidden = ejected;
   $('playback-timeline').hidden = ejected;
+  $('loaded-tape').setAttribute('aria-hidden', String(ejected));
   box.classList.toggle('is-playing', playing);
   $('play').classList.toggle('is-active', playing);
   $('play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
@@ -116,6 +136,7 @@ function updatePlayback() {
   $('playback-state').textContent = ejected ? 'DECK EMPTY' : `${playing ? 'NOW PLAYING' : audio.currentTime ? 'PAUSED' : 'READY TO PLAY'} · TAPE ${String(current + 1).padStart(2, '0')}`;
   for (const id of ['rewind', 'forward', 'eject']) $(id).disabled = ejected;
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = ejected ? 'none' : playing ? 'playing' : 'paused';
+  updateMeters();
 }
 
 async function startPlayback() {
@@ -201,9 +222,59 @@ function syncVolume() {
   const silent = audio.muted || audio.volume === 0;
   $('mute').setAttribute('aria-pressed', String(silent));
   $('mute').setAttribute('aria-label', silent ? 'Unmute' : 'Mute');
-  volume.value = String(audio.muted ? 0 : Math.round(audio.volume * 100));
-  volume.setAttribute('aria-valuetext', `${volume.value}%`);
+  const value = audio.muted ? 0 : Math.round(audio.volume * 100);
+  volume.setAttribute('aria-valuenow', String(value));
+  volume.setAttribute('aria-valuetext', `${value}%${audio.muted ? ', muted' : ''}`);
+  volume.style.setProperty('--knob-angle', `${-135 + value * 2.7}deg`);
+  $('volume-value').textContent = `${value}%`;
+  updateMeters();
 }
+
+function setVolume(value) {
+  audio.volume = Math.max(0, Math.min(100, value)) / 100;
+  audio.muted = false;
+  if (audio.volume > 0) lastVolume = audio.volume;
+  syncVolume();
+}
+
+let dialDrag = null;
+function pointerAngle(event) {
+  const rect = volume.getBoundingClientRect();
+  return Math.atan2(event.clientX - rect.left - rect.width / 2, rect.top + rect.height / 2 - event.clientY) * 180 / Math.PI;
+}
+volume.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0 || dialDrag) return;
+  event.preventDefault();
+  volume.focus();
+  volume.setPointerCapture(event.pointerId);
+  const rect = volume.getBoundingClientRect();
+  const distance = Math.hypot(event.clientX - rect.left - rect.width / 2, event.clientY - rect.top - rect.height / 2);
+  dialDrag = { id: event.pointerId, angle: pointerAngle(event), y: event.clientY, linear: distance < rect.width * .2, value: audio.muted ? 0 : audio.volume * 100 };
+  volume.classList.add('is-dragging');
+});
+volume.addEventListener('pointermove', (event) => {
+  if (!dialDrag || event.pointerId !== dialDrag.id) return;
+  const angle = pointerAngle(event);
+  let delta = angle - dialDrag.angle;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  dialDrag.value = Math.max(0, Math.min(100, dialDrag.value + (dialDrag.linear ? (dialDrag.y - event.clientY) * .7 : delta / 2.7)));
+  dialDrag.angle = angle;
+  dialDrag.y = event.clientY;
+  setVolume(dialDrag.value);
+});
+function finishDialDrag() { dialDrag = null; volume.classList.remove('is-dragging'); }
+volume.addEventListener('pointerup', finishDialDrag);
+volume.addEventListener('pointercancel', finishDialDrag);
+volume.addEventListener('lostpointercapture', finishDialDrag);
+volume.addEventListener('keydown', (event) => {
+  const value = audio.muted ? 0 : audio.volume * 100;
+  const values = { ArrowUp: value + 2, ArrowRight: value + 2, ArrowDown: value - 2, ArrowLeft: value - 2, PageUp: value + 10, PageDown: value - 10, Home: 0, End: 100 };
+  if (!(event.key in values)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  setVolume(values[event.key]);
+});
 
 $('play').addEventListener('click', togglePlayback);
 $('previous').addEventListener('click', () => loadTape(current - 1, true));
@@ -214,12 +285,6 @@ $('eject').addEventListener('click', ejectTape);
 $('mute').addEventListener('click', () => {
   if (audio.volume === 0) { audio.volume = lastVolume; audio.muted = false; }
   else audio.muted = !audio.muted;
-  syncVolume();
-});
-volume.addEventListener('input', () => {
-  audio.volume = Number(volume.value) / 100;
-  audio.muted = false;
-  if (audio.volume > 0) lastVolume = audio.volume;
   syncVolume();
 });
 seek.addEventListener('input', () => {
@@ -247,9 +312,9 @@ audio.addEventListener('playing', () => { box.classList.remove('is-buffering'); 
 audio.addEventListener('play', updatePlayback);
 audio.addEventListener('pause', updatePlayback);
 audio.addEventListener('waiting', () => {
-  if (!audio.paused && !ejected) { box.classList.add('is-buffering'); status('Buffering the tape…'); }
+  if (!audio.paused && !ejected) { box.classList.add('is-buffering'); updateMeters(); status('Buffering the tape…'); }
 });
-audio.addEventListener('canplay', () => box.classList.remove('is-buffering'));
+audio.addEventListener('canplay', () => { box.classList.remove('is-buffering'); updateMeters(); });
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('loadedmetadata', updateProgress);
 audio.addEventListener('durationchange', updateProgress);
@@ -265,7 +330,7 @@ audio.addEventListener('error', () => {
 
 document.addEventListener('keydown', (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  if (event.target.closest('button, input, textarea, select, a, [contenteditable="true"]')) return;
+  if (event.target.closest('button, input, textarea, select, a, [role="slider"], [contenteditable="true"]')) return;
   if (event.code === 'Space') { event.preventDefault(); togglePlayback(); }
   else if (event.code === 'ArrowLeft') { event.preventDefault(); skip(-15); }
   else if (event.code === 'ArrowRight') { event.preventDefault(); skip(15); }
@@ -293,7 +358,9 @@ if ('mediaSession' in navigator) {
 drawShelf();
 audio.volume = .75;
 syncVolume();
-loadTape(0);
+updateProgress();
+updatePlayback();
+status('Pick a tape from the shelf, or press play to load the first tape.');
 
 // Optional agent controls, sharing the exact actions used by the visible player.
 if (document.modelContext?.registerTool) {

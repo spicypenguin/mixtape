@@ -22,6 +22,12 @@ The audio element deliberately does not set `crossorigin`: ordinary remote audio
 
 ## Controls and accessibility
 
-Play/pause, previous/next tape, rewind/forward 15 seconds, eject/reload, volume/mute, seek bar, automatic next tape, and supported OS media controls. Space toggles playback and left/right arrows seek when focus is outside interactive controls. Native buttons and sliders remain keyboard accessible. Animation respects reduced-motion preferences. Optional WebMCP tools are registered only in browsers that support the API.
+The player starts with an empty deck and makes no audio request until a tape is selected or Play is pressed. Browse cassette spines by title and artist. Play/pause, previous/next tape, rewind/forward 15 seconds, eject/reload, a rotary volume dial with mute, a seek bar, automatic next tape, and supported OS media controls are included. Space toggles playback and left/right arrows seek when focus is outside interactive controls. Turn the volume dial with a mouse or touch; arrow keys adjust it in small steps, Page Up/Down in larger steps, and Home/End select its minimum/maximum. Animation respects reduced-motion preferences. Optional WebMCP tools are registered only in browsers that support the API.
+
+The L/R output meters animate independently while audio is playing and stop on pause, buffering, mute, or eject. Their display follows the volume setting but is simulated: the current audio origin does not return the CORS headers needed for cross-origin Web Audio analysis.
+
+## Merge split tapes
+
+See [tools/README.md](tools/README.md) for the Python utility that merges Round 9, Round X, or a custom ordered set of files into one MP3 with embedded ID3 chapters and a website-friendly JSON chapter file. It creates local outputs only.
 
 Typography uses Google Fonts with local system fallbacks. No analytics, accounts, cookies, or database.

@@ -20,32 +20,36 @@
     </header>
 
     <main>
-      <section class="now-playing" id="player-heading" aria-label="Now playing">
-        <div class="now-copy"><span class="eyebrow" id="playback-state">READY TO PLAY · TAPE 01</span><h1 id="now-title">Round 2! It's here!</h1><p id="now-artist">tableTRASH</p></div>
-        <div class="timeline" id="playback-timeline"><div class="time-labels"><span id="elapsed">0:00</span><span id="duration">—:—</span></div><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Playback position" disabled><div class="timeline-caption"><span id="status" role="status" aria-live="polite">Press play to start the tape.</span><span class="shortcut"><kbd>SPACE</kbd> PLAY / PAUSE</span></div></div>
+      <section class="now-playing is-empty" id="player-heading" aria-label="Now playing">
+        <div class="now-copy"><span class="eyebrow" id="playback-state" hidden>DECK EMPTY</span><h1 id="now-title">Long live the mixtape.</h1><p id="now-artist">Pick a tape. Press play. Stay a while.</p></div>
+        <div class="timeline" id="playback-timeline" hidden><div class="time-labels"><span id="elapsed">0:00</span><span id="duration">—:—</span></div><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Playback position" disabled><div class="timeline-caption"><span id="status" role="status" aria-live="polite">Press play to start the tape.</span><span class="shortcut"><kbd>SPACE</kbd> PLAY / PAUSE</span></div></div>
       </section>
       <section class="stereo-area" aria-label="Stereo cassette player">
         <div class="carry-handle" aria-hidden="true"></div>
-        <div class="boombox" id="boombox">
+        <div class="boombox is-ejected" id="boombox">
           <div class="top-rail">
             <div class="hardware-brand">MIXTAPE<span>STEREO CASSETTE SYSTEM</span></div>
-            <div class="model-number">MT–<b>1984</b><span>HIGH FIDELITY / PORTABLE STEREO</span></div>
+            <div class="volume-dial">
+              <span class="volume-name" id="volume-label">VOLUME</span>
+              <div class="knob-row"><span aria-hidden="true">MIN</span><div id="volume" class="volume-knob" role="slider" tabindex="0" aria-labelledby="volume-label" aria-describedby="volume-help" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75" aria-valuetext="75%"><i class="knob-pointer" aria-hidden="true"></i></div><span aria-hidden="true">MAX</span></div>
+              <div class="knob-meta"><button id="mute" type="button" aria-label="Mute" aria-pressed="false">MUTE</button><output id="volume-value" aria-hidden="true">75%</output></div>
+              <span id="volume-help" class="sr-only">Drag around the dial to adjust volume. Use arrow keys for small changes, Page Up or Page Down for larger changes, Home for minimum, and End for maximum.</span>
+            </div>
           </div>
 
           <div class="tuner-row">
             <div class="power-indicator"><span id="power-led" class="led"></span><span id="power-label">STANDBY</span></div>
-            <div class="tuner" aria-hidden="true"><div class="tuner-scale"><span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108 <small>MHz</small></span></div><div class="tuner-ticks"></div><div class="tuner-needle"></div></div>
-            <span class="stereo-badge">FM <b>STEREO</b></span>
+            <div class="level-meter" aria-hidden="true"><div class="meter-caption"><span>OUTPUT LEVEL</span><span>−20　−10　0　+3</span></div><div class="meter-line"><b>L</b><div class="meter-track"><div class="meter-fill"></div></div></div><div class="meter-line"><b>R</b><div class="meter-track"><div class="meter-fill"></div></div></div></div>
           </div>
 
           <div class="main-hardware">
-            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div><div class="speaker-caption">2-WAY SPEAKER SYSTEM <span>L</span></div></div>
+            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div></div>
 
             <div class="deck">
               <div class="deck-topline"><span>CASSETTE DECK</span><span>AUTO PLAY →</span></div>
               <div class="cassette-door" id="cassette-door">
                 <div class="empty-deck"><span>NO TAPE</span><small>Choose one from the shelf below</small></div>
-                <div class="cassette loaded-tape" id="loaded-tape" aria-label="Loaded cassette">
+                <div class="cassette loaded-tape" id="loaded-tape" aria-label="Loaded cassette" aria-hidden="true">
                   <div class="tape-label"><div class="label-heading"><b>A</b><span id="tape-artist">tableTRASH</span><span class="tape-type">MIX / 01</span></div><div class="handwritten" id="tape-title">Round 2! It's here!</div></div>
                   <div class="tape-stripe"></div>
                   <div class="reel-window"><div class="reel" aria-hidden="true"></div><div class="tape-window" aria-hidden="true"><div></div></div><div class="reel" aria-hidden="true"></div></div>
@@ -63,14 +67,9 @@
               </div>
             </div>
 
-            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div><div class="speaker-caption">2-WAY SPEAKER SYSTEM <span>R</span></div></div>
+            <div class="speaker-panel" aria-hidden="true"><div class="tweeter"></div><div class="speaker"><div class="speaker-cone"><div class="speaker-cap"></div></div><div class="speaker-mesh"></div></div></div>
           </div>
 
-          <div class="bottom-rail">
-            <div class="level-meter" aria-hidden="true"><div class="meter-caption"><span>OUTPUT LEVEL</span><span>−20　−10　0　+3</span></div><div class="meter-line"><b>L</b><div class="meter-track"><div class="meter-fill"></div></div></div><div class="meter-line"><b>R</b><div class="meter-track"><div class="meter-fill"></div></div></div></div>
-            <div class="counter"><span>TAPE COUNTER</span><output id="counter">0000</output></div>
-            <div class="volume-control"><button id="mute" type="button" aria-label="Mute" aria-pressed="false">VOL</button><span aria-hidden="true">−</span><input id="volume" type="range" min="0" max="100" value="75" aria-label="Volume"><span aria-hidden="true">+</span></div>
-          </div>
           <i class="screw tl" aria-hidden="true"></i><i class="screw tr" aria-hidden="true"></i><i class="screw bl" aria-hidden="true"></i><i class="screw br" aria-hidden="true"></i>
         </div>
         <div class="feet" aria-hidden="true"><i></i><i></i></div>
