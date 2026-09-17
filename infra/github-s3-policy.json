@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": [
+        "arn:aws:s3:::mixtape-tabletrash/index.html",
+        "arn:aws:s3:::mixtape-tabletrash/app.js",
+        "arn:aws:s3:::mixtape-tabletrash/tracks.js",
+        "arn:aws:s3:::mixtape-tabletrash/styles.css",
+        "arn:aws:s3:::mixtape-tabletrash/favicon.svg"
+      ]
+    }
+  ]
+}

@@ -7,7 +7,7 @@ The workflow tests and builds pull requests. Pushes to `main` or `master` deploy
 1. The GitHub repository is `spicypenguin/mixtape`; the local `origin` uses `git@github.com:spicypenguin/mixtape.git`.
 2. In GitHub **Settings → Environments**, create `production` and restrict deployment branches to your default branch. This restriction is important because the AWS trust policy below trusts this environment.
 3. In AWS IAM, add the OpenID Connect provider `https://token.actions.githubusercontent.com` with audience `sts.amazonaws.com`, unless it already exists.
-4. Create an IAM role with the trust policy below, replacing `ACCOUNT_ID` and `spicypenguin/mixtape`. Attach the permissions policy below, replacing the distribution ARN. No long-lived AWS keys are needed.
+4. Create an IAM role with the trust policy below, replacing `325414188990` and `spicypenguin/mixtape`. Attach the permissions policy below, replacing the distribution ARN. No long-lived AWS keys are needed.
 5. Under the GitHub `production` environment's **Variables**, configure:
 
 | Variable | Value |
@@ -28,7 +28,7 @@ The bucket and CloudFront distribution must already serve this site. The workflo
   "Version": "2012-10-17",
   "Statement": [{
     "Effect": "Allow",
-    "Principal": {"Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"},
+    "Principal": {"Federated": "arn:aws:iam::325414188990:oidc-provider/token.actions.githubusercontent.com"},
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {"StringEquals": {
       "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
@@ -60,7 +60,7 @@ This permits writes only to the frontend keys. It does not permit deletion or au
     {
       "Effect": "Allow",
       "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"],
-      "Resource": "arn:aws:cloudfront::ACCOUNT_ID:distribution/DISTRIBUTION_ID"
+      "Resource": "arn:aws:cloudfront::325414188990:distribution/DISTRIBUTION_ID"
     }
   ]
 }
