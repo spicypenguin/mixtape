@@ -1,5 +1,5 @@
 {
-  "audioBaseUrl": "https://mixtape.ididthis.xyz/",
+  "audioBaseUrl": "https://mixtape.ididthis.xyz/tracks/",
   "tapes": [
     {
       "id": "tape-01",
@@ -52,7 +52,7 @@
       "chapters": [
         {
           "title": "Track 01",
-          "startSeconds": 0.0,
+          "startSeconds": 0,
           "endSeconds": 151.987
         },
         {
@@ -108,11 +108,11 @@
         {
           "title": "Track 12",
           "startSeconds": 2609.2,
-          "endSeconds": 2900.0
+          "endSeconds": 2900
         },
         {
           "title": "Track 13",
-          "startSeconds": 2900.0,
+          "startSeconds": 2900,
           "endSeconds": 3156.307
         },
         {
@@ -171,7 +171,7 @@
       "chapters": [
         {
           "title": "Track 01",
-          "startSeconds": 0.0,
+          "startSeconds": 0,
           "endSeconds": 51.933
         },
         {
