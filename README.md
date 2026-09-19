@@ -8,7 +8,7 @@ Requires Node.js. Run `npm run dev`, then visit http://127.0.0.1:4173. Run `npm 
 
 ## Audio
 
-`config/tapes.json` contains the active 11-tape collection, including merged Rounds 09 and 10 with chapter timings. The renamed MP3s are in the Git-ignored `tracks/` folder and uploaded to the audio origin. `audioBaseUrl` currently points to `https://mixtape.ididthis.xyz/`. Audio is streamed directly, not proxied, bundled, or downloaded in full up front. Only the loaded tape requests metadata.
+`config/tapes.json` contains the active 11-tape collection, including merged Rounds 09 and 10 with chapter timings. The renamed MP3s are in the Git-ignored `tracks/` folder and uploaded to the audio origin. `audioBaseUrl` currently points to `https://mixtape.ididthis.xyz/tracks/`. Audio is streamed directly, not proxied, bundled, or downloaded in full up front. Only the loaded tape requests metadata.
 
 If moving the website hostname to a different host, first give the current audio bucket/CDN a separate HTTPS hostname (for example `audio.ididthis.xyz`) and change `audioBaseUrl` in the catalog to that verified origin. Otherwise the old MP3 URLs would resolve to the new frontend and stop working. If keeping both website and audio on the existing S3/CloudFront origin, no change is needed.
 
@@ -40,7 +40,7 @@ Edit `config/tapes.json`, not generated `dist/tracks.js`. Each tape has a stable
 
 To update the collection:
 
-1. Upload new MP3s to the existing audio bucket using the filenames in the catalog. Keep existing remote objects available for old links.
+1. Upload new MP3s under `tracks/` in the existing audio bucket using the filenames in the catalog. Keep existing remote objects available for old links.
 2. Verify all new URLs are playable, then update `config/tapes.json`.
 3. Run `npm run build` and `npm test`, then deploy `dist/`.
 

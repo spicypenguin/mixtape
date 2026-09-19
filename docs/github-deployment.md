@@ -68,7 +68,7 @@ This permits writes only to the frontend keys. It does not permit deletion or au
 
 ## Updating tapes
 
-Upload new MP3s separately, edit `config/tapes.json`, then push. Actions rebuilds `dist/tracks.js` from the catalog. The audio base URL remains `https://mixtape.ididthis.xyz/`; deploying the frontend alongside those MP3s preserves playback.
+Upload new MP3s under the bucket’s `tracks/` prefix, edit `config/tapes.json`, then push. Actions rebuilds `dist/tracks.js` from the catalog. The audio base URL remains `https://mixtape.ididthis.xyz/tracks/`; deploying the frontend alongside those MP3s preserves playback.
 
 See [GitHub's AWS OIDC instructions](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) and the [official AWS credential action](https://github.com/aws-actions/configure-aws-credentials).
 
